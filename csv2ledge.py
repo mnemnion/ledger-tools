@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 
-# CSV to Ledger converter, coopfcu and Shift Payments edition
+# CSV to Ledger converter, cue_branch and Shift Payments edition
 
 import csv
 import argparse
@@ -94,8 +94,9 @@ def detect_csv_type(csv_read):
 		csv_read.next()
 		return 'shift'
 	elif first_row[0] == 'Account Number': # New Coopfcu
-		return 'coopfcu-new'
+		return 'cue_branch'
 	elif first_row[0] == 'Date' and first_row[1] == 'Description':
+		# NB: this hash is useless to anyone but the original author
 		print 'Error: old coopfcu format, use commit b2b9c01af759ed912498c161d4e493b7ae32beb7'
 		exit()
 	elif first_row[1] == 'Time' and first_row[2] == 'TimeZone':
@@ -145,8 +146,8 @@ def extract_shift(row):
 	return log
 
 
-def extract_coopfcu(row):
-	"""extract info from a coopfcu CSV row"""
+def extract_cue_branch(row):
+	"""extract info from a cue_branch CSV row"""
 	entry_date = arrow.get(row[2], 'MM/D/YYYY').format('YYYY-MM-DD')
 	entry_description = row[5]
 	entry_name = row[6]
@@ -184,8 +185,8 @@ with ledger_file as csvfile:
 	csv_read = csv.reader(csvfile)
 	print 'Miscellaneous Entries:'
 	csv_type = detect_csv_type(csv_read)
-	if csv_type == 'coopfcu-new':
-		extract = extract_coopfcu
+	if csv_type == 'cue_branch':
+		extract = extract_cue_branch
 	elif csv_type == 'shift':
 		reverse_entries = False
 		extract = extract_shift
