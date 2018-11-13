@@ -135,10 +135,13 @@ def extract_shift(row):
 
 	if not categorized:
 		print(name + ' : ' + amount_usd + ' : ' + date)
-
-	log = date + '   ' + 'Shift Payments' + '\n'
+	# Log price of crypto
+	log = 'P ' + date + ' ' + unit + ' ' + usd_per_unit + '\n\n'
+	# Log exchange for USD
+	log += date + '   ' + 'Shift Payments' + '\n'
 	log += '   ' + 'Assets:Cash' + '          $' +  amount_usd + '\n'
 	log += '   ' + UNITS[unit] + '       ' + unit + ' ' + amount_unit + '{=' + usd_per_unit + '}\n'
+	# Log purchase
 	log += date + '   ' + titlecase(name) + '\n'
 	log += '   ' + 'Assets:Cash' + '       $' +  str_minus(amount_usd) + '\n'
 	log += '   ' + entry_type +  	'\n\n'
@@ -195,8 +198,7 @@ with ledger_file as csvfile:
 		exit()
 	for row in csv_read:
 		log = extract(row)
-		if not log == '':
-			entries.append(log)
+		entries.append(log)
 
 with out_file as out:
 	out.write(';; ~Auto Generated~ @ ' + arrow.now().format()
@@ -207,4 +209,3 @@ with out_file as out:
 	else:
 		for entry in entries:
 			out.write(entry)
-		out.write(entry)

@@ -40,61 +40,51 @@ digit = re.compile(r'\d')
 # key: arrow date object, value: full text of entry
 entries = {}
 
-entry = None
+entry = [""]
+
+# This is an exceptionally dirty hack:
+entries[arrow.get("0001-01-01")] = entry
+# Please do not use this script on ledgers which predate the birth of Christ
 
 count_in = 0
 
+def date_pull(line):
+   """Do our best to decipher a date"""
+   try:
+      date = arrow.get(line)
+   except arrow.parser.ParserError:
+      print("not a date: " + line)
+      exit()
+   return date
+
+def append_entry(entry, date, line):
+   """Append to existing date or add new entry"""
+   if date in entries:
+         entries[date].append(line)
+   else: # New entry
+      entry = [line]
+      entries[date] = entry
+   return entry
+
+# Main event
+
+# Parse the dates out and add to entries dict
 for line in ledger:
    if digit.match(line):
-      # We should have a date
-      date = None
-      try:
-         date = arrow.get(line, "YYYY-MM-DD HH:mm:ss")
-      except arrow.parser.ParserError:
-         try:
-            date = arrow.get(line, "YYYY-MM-DD")
-         except arrow.parser.ParserError:
-            print("not a date: " + line)
-            exit()
-      # We might have an identical date, if so, append to that
-      if date in entries:
-         entries[date].append(line)
-      else: # New entry
-         entry = []
-         entry.append(line)
-         entries[date] = entry
+      date = date_pull(line)
+      entry = append_entry(entry, date, line)
    elif line[0] == ' ' or line[0] == '\n':
-      if not entry:  # This happens if the first line is not a date
-         entry = []
-         # This is an exceptionally dirty hack:
-         entries[arrow.get("0001-01-01")] = entry
-         # Please do not use this script on ledgers which predate the birth of Christ
       entry.append(line)
+   elif line[0] == 'P':
+      date = date_pull(line[2:])
+      entry = append_entry(entry, date, line)
    else:
-      # This should handle commodity prices and other things with dates
-      # in them, in the mean time it's a copyclone:
-      if not entry:  # This happens if the first line is not a date
-         entry = []
-         # This is an exceptionally dirty hack:
-         entries[arrow.get("0001-01-01")] = entry
-         # Please do not use this script on ledgers which predate the birth of Christ
       entry.append(line)
-   count_in += 1
-
-count_out = 0
 
 with out_ledger as out:
    for date in sorted(entries):
       for line in entries[date]:
          out.write(line)
-         count_out +=1
-
-if count_out != count_in:
-   # This doesn't actually count writes, I need to go back in and
-   # compare these manually
-
-   print("Warning: line counts don't match! in: "
-            + repr(count_in) + " out: " + repr(count_out))
 
 
 
