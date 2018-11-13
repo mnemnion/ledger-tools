@@ -140,7 +140,7 @@ def extract_shift(row):
 	# Log exchange for USD
 	log += date + '   ' + 'Shift Payments' + '\n'
 	log += '   ' + 'Assets:Cash' + '          $' +  amount_usd + '\n'
-	log += '   ' + UNITS[unit] + '       ' + unit + ' ' + amount_unit + '{=' + usd_per_unit + '}\n'
+	log += '   ' + UNITS[unit] + '       ' + unit + ' ' + amount_unit + '{' + usd_per_unit + '}\n'
 	# Log purchase
 	log += date + '   ' + titlecase(name) + '\n'
 	log += '   ' + 'Assets:Cash' + '       $' +  str_minus(amount_usd) + '\n'

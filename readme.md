@@ -12,7 +12,7 @@ Shift Payments, which will track both your USD price and the crypto
 you sold for it.
 
 The resulting ledger is in the order of the rows of the CSV, unless
-it's not. To sort them use the creatively-named `date_sort.py`. Note
+it's reverse. To sort them use the creatively-named `date_sort.py`. Note
 that it reads a limited subset of the ledger-cli language and tries
 to do the right thing with lines it doesn't recognize; if you have a
 use that breaks it, I'm interested, please file an issue.
